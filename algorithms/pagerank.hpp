@@ -37,24 +37,22 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
         PageRankValueType diff = PageRankValueType();
         VertexIterator ui, ui_end;
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
-            diff += std::abs(a1[get(indexMap, *ui)] - a2[get(indexMap, *ui)]);
+            diff += abs(a1[get(indexMap, *ui)] - a2[get(indexMap, *ui)]);
         }
         return diff > allowedDiff;
     };
 
     int N = num_vertices(g);
 
-
     std::vector<PageRankValueType> tempPageRankMap(N);
     std::vector<PageRankValueType> pageRankMap(N);
 
-    PageRankValueType one; ++one;
+    PageRankValueType one = PageRankValueType(); ++one;
 
     VertexIterator ui, ui_end;
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
         pageRankMap[get(indexMap, *ui)] = one/N;
     }
-
 
     do {
         std::copy(pageRankMap.begin(), pageRankMap.end(), tempPageRankMap.begin());
@@ -65,7 +63,7 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
                 Vertex sourceVertex = source(*ei, g);
                 temp += tempPageRankMap[get(indexMap, sourceVertex)] / out_degree(sourceVertex, g);
             }
-            temp *= beta;
+            temp = temp * beta;
             pageRankMap[get(indexMap, *ui)] = temp;
         }
 

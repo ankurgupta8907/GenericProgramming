@@ -17,10 +17,97 @@
 using namespace std;
 using namespace boost;
 
+class MyDouble {
+private:
+    double val;
+public:
+    MyDouble() {
+        val = 0.0;
+    }
+
+    explicit MyDouble(double otherDouble) {
+        val = otherDouble;
+    }
+
+    MyDouble(const MyDouble& other) {
+        val = other.val;
+    }
+
+    MyDouble& operator=(const MyDouble& other) {
+        val = other.val;
+        return *this;
+    }
+
+    MyDouble& operator++() {
+        val++;
+        return *this;
+    }
+
+    bool operator==(const MyDouble& other) {
+        return val == other.val;
+    }
+
+    bool operator!=(const MyDouble& other) {
+        return val != other.val;
+    }
+
+    bool operator<(const MyDouble& other) {
+        return val < other.val;
+    }
+
+    bool operator>(const MyDouble& other) {
+        return val > other.val;
+    }
+
+    MyDouble operator+(const MyDouble& other) const {
+        MyDouble newDouble;
+        newDouble.val = val + other.val;
+        return newDouble;
+    }
+
+    MyDouble operator-(const MyDouble& other) const {
+        MyDouble newDouble;
+        newDouble.val = val - other.val;
+        return newDouble;
+    }
+
+    MyDouble operator*(const MyDouble& other) const {
+        MyDouble newDouble;
+        newDouble.val = val * other.val;
+        return newDouble;
+    }
+
+    MyDouble operator/(const MyDouble& other) const {
+        MyDouble newDouble;
+        newDouble.val = val / other.val;
+        return newDouble;
+    }
+
+    MyDouble operator/(int otherVal) const {
+        MyDouble newDouble;
+        newDouble.val = val / otherVal;
+        return newDouble;
+    }
+
+    MyDouble& operator+=(const MyDouble& other) {
+        val += other.val;
+        return *this;
+    }
+
+    double getVal() const {
+        return val;
+    }
+};
+
+MyDouble abs(const MyDouble& a) {
+    return MyDouble(a.getVal() < 0 ? -a.getVal() : a.getVal());
+}
+
+
 int main(int, char *[]) {
 
     // Using set as vertexList.
-    typedef adjacency_list < setS, setS, bidirectionalS, property < vertex_pagerank_t, double >> Graph;
+    typedef adjacency_list < setS, setS, bidirectionalS, property < vertex_pagerank_t, MyDouble >> Graph;
 
     Graph g(4);
     typedef typename graph_traits<Graph>::vertex_descriptor Vertex;
@@ -50,13 +137,12 @@ int main(int, char *[]) {
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
         put(propmapIndex, *ui, i++);
     }
-    pagerank(g, propmapIndex, 1.0, 0.00001);
+    pagerank(g, propmapIndex, MyDouble(1.0), MyDouble(0.00001));
 
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
         cout << "Vertex " << get(propmapIndex, *ui) << " has pagerank " <<
-                get(get(vertex_pagerank, g), *ui) << "." << endl;
+                get(get(vertex_pagerank, g), *ui).getVal() << "." << endl;
     }
-
 
     return 0;
 }
