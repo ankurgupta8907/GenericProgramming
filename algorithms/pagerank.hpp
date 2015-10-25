@@ -34,7 +34,7 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
 
     auto compare = [&g, &allowedDiff, &indexMap](const std::vector<PageRankValueType>& a1,
                                                  const std::vector<PageRankValueType>& a2) {
-        PageRankValueType diff = PageRankValueType();
+        PageRankValueType diff;
         VertexIterator ui, ui_end;
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             diff += abs(a1[get(indexMap, *ui)] - a2[get(indexMap, *ui)]);
