@@ -47,7 +47,7 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
     std::vector<PageRankValueType> tempPageRankMap(N);
     std::vector<PageRankValueType> pageRankMap(N);
 
-    PageRankValueType one = PageRankValueType(); ++one;
+    PageRankValueType one; ++one;
 
     VertexIterator ui, ui_end;
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
@@ -58,7 +58,7 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
         std::copy(pageRankMap.begin(), pageRankMap.end(), tempPageRankMap.begin());
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             InEdgeIterator ei, ei_end;
-            PageRankValueType temp = PageRankValueType();
+            PageRankValueType temp;
             for (boost::tie(ei, ei_end) = in_edges(*ui, g); ei != ei_end; ++ei) {
                 Vertex sourceVertex = source(*ei, g);
                 temp += tempPageRankMap[get(indexMap, sourceVertex)] / out_degree(sourceVertex, g);
@@ -67,7 +67,7 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
             pageRankMap[get(indexMap, *ui)] = temp;
         }
 
-        PageRankValueType S = PageRankValueType();
+        PageRankValueType S;
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             S += pageRankMap[get(indexMap, *ui)];
         }
