@@ -22,12 +22,12 @@ namespace boost {
 }
 
 /**
- * The parameters to the algorithm are:
- *    1) Graph g : The graph.
- *    2) IndexMap indexMap : indexMap maps each vertex to a value between 0 and (vextex list size - 1).
- *    3) RankValueType beta : Fraction of value given to regular jumps vs random teleport.
- *    4) RankValueType allowedDiff : Value of allowed diff between two iterations.
- */
+* The parameters to the algorithm are:
+*    1) Graph g : The graph.
+*    2) IndexMap indexMap : indexMap maps each vertex to a value between 0 and (vertex list size - 1).
+*    3) RankValueType beta : Fraction of value given to regular jumps via transition matrix vs random teleport.
+*    4) RankValueType allowedDiff : Value of allowed diff in vector of pagerank values between two iterations.
+*/
 template<typename Graph, typename RankValueType, typename IndexMap>
 void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType allowedDiff) {
     typedef typename graph_traits<Graph>::vertex_iterator VertexIterator;
