@@ -15,14 +15,18 @@
 
 using namespace boost;
 
+// Vertex property to store page rank.
 enum vertex_pagerank_t { vertex_pagerank };
-
 namespace boost {
     BOOST_INSTALL_PROPERTY(vertex, pagerank);
 }
 
 /**
- * TODO Documentation.
+ * The parameters to the algorithm are:
+ *    1) Graph g : The graph.
+ *    2) IndexMap indexMap : indexMap maps each vertex to a value between 0 and (vextex list size - 1).
+ *    3) RankValueType beta : Fraction of value given to regular jumps vs random teleport.
+ *    4) RankValueType allowedDiff : Value of allowed diff between two iterations.
  */
 template<typename Graph, typename RankValueType, typename IndexMap>
 void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType allowedDiff) {
@@ -32,6 +36,9 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
     typedef typename property_map<Graph, vertex_pagerank_t>::type PageRankMap;
     typedef typename property_traits<PageRankMap>::value_type PageRankValueType;
 
+
+    // Compare two vectors of page rank to determine if total difference of page rank in two vectors in within
+    // threshold allowedDiff.
     auto compare = [&g, &allowedDiff, &indexMap](const std::vector<PageRankValueType>& a1,
                                                  const std::vector<PageRankValueType>& a2) {
         PageRankValueType diff;
@@ -42,20 +49,31 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
         return diff > allowedDiff;
     };
 
+    // Number of vertices.
     int N = num_vertices(g);
 
-    std::vector<PageRankValueType> tempPageRankMap(N);
+
+    // Pagerank vector.
     std::vector<PageRankValueType> pageRankMap(N);
 
+    // Temporary pagerank vector to calculate new pagerank in each iteration.
+    std::vector<PageRankValueType> tempPageRankMap(N);
+
+    // PageRank of value one. The initialization is supposed to give a value of zero. ++ operator is used to increment
+    // the value to one.
     PageRankValueType one; ++one;
 
+    // Assign the initial pagerank.
     VertexIterator ui, ui_end;
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
         pageRankMap[get(indexMap, *ui)] = one/N;
     }
 
+    // Keep iterating until the difference of total page rank between two successive iterations is less than allowed
+    // threshold.
     do {
         std::copy(pageRankMap.begin(), pageRankMap.end(), tempPageRankMap.begin());
+        // Adjust the page rank of each vertex in each iteration.
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             InEdgeIterator ei, ei_end;
             PageRankValueType temp;
@@ -67,17 +85,20 @@ void pagerank(Graph& g, IndexMap indexMap, RankValueType beta, RankValueType all
             pageRankMap[get(indexMap, *ui)] = temp;
         }
 
+        // Calculate the total of page rank value.
         PageRankValueType S;
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             S += pageRankMap[get(indexMap, *ui)];
         }
 
+        // Distribute the leaked value of page rank equally to all nodes.
         for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
             pageRankMap[get(indexMap, *ui)] += (one - S)/N;
         }
     }
     while (compare(tempPageRankMap, pageRankMap));
 
+    // Putting the page rank values in the vertex property.
     PageRankMap outPageRankMap = get(vertex_pagerank, g);
     for (boost::tie(ui, ui_end) = vertices(g); ui != ui_end; ++ui) {
         put(outPageRankMap, *ui, pageRankMap[get(indexMap, *ui)]);

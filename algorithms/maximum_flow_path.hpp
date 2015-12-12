@@ -11,9 +11,6 @@
 
 using namespace boost;
 
-/**
- * TODO Documentation.
- */
 
 template <typename Graph, typename P, typename T, typename R>
 void maximum_flow_path(Graph& g,
